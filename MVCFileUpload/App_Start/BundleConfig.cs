@@ -23,10 +23,10 @@ namespace MVCFileUpload
                       "~/Scripts/jQuery.FileUpload/jquery.iframe-transport.js",
                       "~/Scripts/jQuery.FileUpload/jquery.fileupload.js",
                       "~/Scripts/jQuery.FileUpload/jquery.fileupload-process.js",
-                      //"~/Scripts/jQuery.FileUpload/jquery.fileupload-image.js",
-                      //"~/Scripts/jQuery.FileUpload/jquery.fileupload-audio.js",
-                      //"~/Scripts/jQuery.FileUpload/jquery.fileupload-video.js",
-                      //"~/Scripts/jQuery.FileUpload/jquery.fileupload-validate.js",
+                      "~/Scripts/jQuery.FileUpload/jquery.fileupload-image.js",
+                      "~/Scripts/jQuery.FileUpload/jquery.fileupload-audio.js",
+                      "~/Scripts/jQuery.FileUpload/jquery.fileupload-video.js",
+                      "~/Scripts/jQuery.FileUpload/jquery.fileupload-validate.js",
                       "~/Scripts/jQuery.FileUpload/fileupload.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're

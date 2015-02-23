@@ -2,43 +2,4 @@
     ViewBag.Title = "Home Page";
 }
 <br />
-<div class="row">
-    <!-- The fileinput-button span is used to style the file input field as button -->
-    <span class="btn btn-success fileinput-button">
-        <i class="glyphicon glyphicon-plus"></i>
-        <span>Add files...</span>
-        <!-- The file input field used as target for the file upload widget -->
-        <input id="fileupload" type="file" name="files[]" multiple>
-    </span>
-    <button disabled title="Start Upload" id="btnStartUpload" type="button" class="btn btn-primary">
-        <span class="glyphicon glyphicon-upload"></span> Start upload
-    </button>
-    <br>
-    <br>
-    <!-- The global progress bar -->
-    <div id="progress" class="progress">
-        <div class="progress-bar progress-bar-success"></div>
-    </div>
-    <!-- The container for the uploaded files -->
-    <div id="files" class="files"></div>
-
-    <div class="panel panel-default hide" id="fileListHolder" style="margin-top: 20px;">
-        <div class="panel-heading">
-            <span class="badge" id="fileCount"></span>
-        </div>
-        <div class="panel-body">
-            <table class="table" id="fileList" title="list of files">
-                <thead>
-                    <tr>
-                        <th class="col-sm-2">Type</th>
-                        <th class="col-sm-5">File Name</th>
-                        <th class="col-sm-2 text-right">Length</th>
-                        <th class="col-sm-2">Status</th>
-                        <th class="col-sm-1">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="fileList"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
+@Html.Partial("_FileUpload")

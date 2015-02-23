@@ -2,8 +2,7 @@
 /*global window, $ */
 $(function () {
     'use strict';
-    var apiUrl = parentUrl + 'api/fileutils',
-        startButton = $('<button/>')
+    var startButton = $('<button/>')
             .addClass('btn btn-xs btn-primary')
             .attr('title', 'upload')
             .on('click', function () {
@@ -13,21 +12,28 @@ $(function () {
                     .off('click')
                     .attr('title', 'abort')
                     .on('click', function () {
-                        $this.remove();
                         data.abort();
+
+                        $this.remove();
+                        data.context
+                            .find('#remove-' + data.uId)
+                               .show();
+                        data.submitted = true;
+                        deleteFile(data, false);
                     })
                     .removeClass('btn-primary')
                     .addClass('btn-warning')
                     .find('#iconBtn')
-                        .removeClass('glyphicon-play-circle')
-                        .addClass('glyphicon-remove-circle');               
+                        .removeClass('glyphicon-arrow-up')
+                        .addClass('glyphicon-ban-circle');
+                data.context.find('#remove-' + data.uId).hide();
                 data.submit().always(function () {
                     $this.remove();
                 });
             })
             .append($('<span/>')
                 .attr('id', 'iconBtn')
-                .addClass('glyphicon glyphicon-play-circle')),
+                .addClass('glyphicon glyphicon-arrow-up')),
         removeButton = $('<button/>')
             .addClass('btn btn-xs btn-danger')
             .attr('title', 'delete')
@@ -35,8 +41,8 @@ $(function () {
                 var $this = $(this),
                     data = $this.data();
                 
-                deleteFile(data, apiUrl);
                 data.files[0].error = 'deleted';
+                deleteFile(data, true);
                 $this.remove();
             })
             .append($('<span/>')
@@ -67,6 +73,7 @@ $(function () {
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
         $('#fileListHolder').removeClass('hide');
+        $('#progress').removeClass('hide');
 
         data.guId = guid();
         data.uId =  $('<div/>').uniqueId().attr('id');
@@ -91,7 +98,7 @@ $(function () {
                     .attr('id', 'status-' + data.uId)
                     .append(fileProgress
                         .clone(true)),
-                tdAction = $('<td/>')
+                tdAction = $('<td class="text-center"/>')
                     .append(startButton
                         .clone(true)
                         .data(data)
@@ -108,26 +115,6 @@ $(function () {
             tdAction.appendTo(data.context);
         });
         $("#fileCount").text(fileCount);
-        $('#btnStartUpload').on('click', function () {
-            var file = data.files[0];
-
-            if (!file.error) {
-                $(this).prop('disabled', true)
-                data.context
-                    .find('#start-' + data.uId)
-                    .off('click')
-                    .on('click', function () {
-                        $(this).remove();
-                        data.abort();
-                    })
-                        .removeClass('btn-primary')
-                        .addClass('btn-warning')
-                        .find('#iconBtn')
-                            .removeClass('glyphicon-play-circle')
-                            .addClass('glyphicon-remove-circle');
-                data.submit();
-            }
-        }).prop('disabled', false);
     }).on('fileuploadprocessalways', function (e, data) {
         var index = data.index,
             file = data.files[index];
@@ -148,6 +135,19 @@ $(function () {
                 .find('.progress')
                 .remove();
         }
+        else
+        {
+            // submit the data
+            if ($('#autoUpload').is(":checked")) {
+                submitData(data);
+            }
+            else {
+                $('#btnStartUpload').on('click', function () {
+                    $(this).prop('disabled', true);
+                    submitData(data);
+                }).prop('disabled', false);
+            }
+        }
     }).on('fileuploadprogress', function (e, data) {
         var progress = parseInt(formatPercentage(data.loaded / data.total));
 
@@ -161,7 +161,6 @@ $(function () {
             .css('width', progress + '%')
             .text(progress + '% @ ' + formatBitrate(data.bitrate));
     }).on('fileuploaddone', function (e, data) {
-        $('#btnStartUpload').off('click');
         $.each(data.result.files, function (index, file) {
             if (file.uid) {
                 var link = $('<a>')
@@ -170,10 +169,6 @@ $(function () {
                 data.context
                     .find('#name-' + data.uId)
                     .wrap(link);
-
-                data.context
-                    .find('#remove-' + data.uId)
-                    .data('uploaded', true);
             } else if (file.error) {
                 data.context
                 .find('#status-' + data.uId)
@@ -187,7 +182,11 @@ $(function () {
             .find('#start-' + data.uId)
                 .off('click')
                 .remove();
-        totalUploaded++;
+        data.context
+            .find('#remove-' + data.uId)
+                .data('uploaded', true)
+                .show();
+        filesUploaded++;
     }).on('fileuploadfail', function (e, data) {
         $.each(data.files, function (index) {
             data.context
@@ -202,6 +201,11 @@ $(function () {
     }).on('fileuploadsubmit', function (e, data) {
         // make sure each submit is unique
         data.formData = { uid: data.guId };
+
+        // file submitted
+        data.context
+            .find('#remove-' + data.uId)
+            .data('submitted', true);
 
         // initial call 
         $.ajax({
@@ -221,11 +225,70 @@ $(function () {
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
 });
 
-var fileCount = 0;
-var totalUploaded = 0;
+var fileCount = 0,
+    filesDeleted = 0,
+    filesUploaded = 0,
+    apiUrl = parentUrl + 'api/fileutils';
+
+// submit data
+var submitData = function (data) {
+    if (data.files.length === 0)
+        return;
+
+    var btnRemove = data.context
+            .find('#remove-' + data.uId),
+        uploaded = btnRemove.data('uploaded'),
+        file = data.files[0],
+        haserror = file.error;
+
+    if (!haserror && !uploaded) {
+        var jqXhrStart = data.submit();
+        $('#btnCancelUpload').prop('disabled', false);
+        btnRemove.hide();
+
+        data.context
+            .find('#start-' + data.uId)
+            .off('click')
+            .on('click', function () {
+                data.abort();
+
+                $(this).remove();
+                data.context
+                    .find('#remove-' + data.uId)
+                       .show();
+                data.submitted = true;
+                deleteFile(data, false);
+            })
+                .removeClass('btn-primary')
+                .addClass('btn-warning')
+                .find('#iconBtn')
+                    .removeClass('glyphicon-arrow-up')
+                    .addClass('glyphicon-ban-circle');
+
+        $('#btnCancelUpload').click(function () {
+            jqXhrStart.abort();
+
+            var startBtn = data.context
+                               .find('#start-' + data.uId);
+
+            if (startBtn.length == 0)
+                return;
+
+            startBtn.off('click')
+                    .remove();
+
+            data.context
+                .find('#remove-' + data.uId)
+                   .show();
+            data.submitted = true;
+            deleteFile(data, false);
+        });
+    }
+};
+
 // delete a file
-var deleteFile = function (data, apiUrl) {
-    if (data.uploaded){
+var deleteFile = function (data, removeContext) {
+    if (data.submitted) {
         $.ajax({
             headers: {
                 'RequestVerificationToken': RequestVerificationToken
@@ -235,7 +298,12 @@ var deleteFile = function (data, apiUrl) {
             data: { uid: data.guId },
             type: "DELETE",
             success: function (response) {
-                // do something here
+                // data deleted
+                data.context
+                    .find('#remove-' + data.uId)
+                    .data('submitted', false);
+
+                filesDeleted++;
             },
             error: function (xmlHttpRequest, textStatus, errorThrown) {
                 if (window.console != undefined) {
@@ -246,28 +314,33 @@ var deleteFile = function (data, apiUrl) {
         });
     }
 
-    // remove the item from the list
-    data.context.remove();
+    if (removeContext) {
+        // remove the item from the list
+        data.context.remove();
 
-    fileCount--;
+        fileCount--;
 
-    $("#fileCount").text(fileCount);
+        $("#fileCount").text(fileCount);
 
-    var progress = formatPercentage(fileCount / totalUploaded)
+        var progress = formatPercentage(fileCount / filesUploaded)
 
-    if (fileCount == 0) {
-        $('#fileListHolder').addClass('hide');
-        totalUploaded = 0;
-        $('#btnStartUpload')
-            .off('click')
-            .prop('disabled', true);
+        if (fileCount == 0) {
+            $('#fileListHolder').addClass('hide');
+            $('#progress').addClass('hide');
+
+            filesUploaded = 0;
+            $('#btnStartUpload')
+                .off('click')
+                .prop('disabled', true);
+        }
+
+        $('#progress .progress-bar')
+            .css('width', progress === "NaN" ? '0' : progress + '%')
+            .text(progress === "NaN" ? '' : progress + '%');
+
+        data.files.length = 0;
+        $('#btnCancelUpload').prop('disabled', fileCount == 0);
     }
-
-    $('#progress .progress-bar')
-        .css('width', progress === "NaN" ? '0' : progress + '%')
-        .text(progress === "NaN" ? '' : progress + '%');
-
-    data = null;
 };
 
 var s4 = function() {
