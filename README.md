@@ -1,5 +1,5 @@
 # MVCFileUpload
-MVC File Upload 
+MVC File Upload using Blueimp jQuery-File-Upload
 
-MVC implementation of Blueimp  jQuery-File-Upload(https://blueimp.github.io/jQuery-File-Upload/).
-More updates to come.
+A simple MVC implementation of Blueimp jQuery-File-Upload(https://blueimp.github.io/jQuery-File-Upload/).
+
