@@ -13,16 +13,26 @@ namespace MVCFileUpload.Controllers
             return View();
         }
 
+        public ActionResult Basic()
+        {
+            return View();
+        }
+
+        public ActionResult Plus()
+        {
+            return View();
+        }
+
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            ViewBag.Message = "";
 
             return View();
         }
 
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "Renante J. Milan";
 
             return View();
         }

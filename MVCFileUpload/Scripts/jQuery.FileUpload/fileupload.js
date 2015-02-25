@@ -61,6 +61,7 @@ $(function () {
         dataType: 'json',
         autoUpload: false,
         acceptFileTypes: /(\.|\/)(gif|jpe?g|png|doc?x|doc|rtf|txt|pdf|zip)$/i,
+        dropZone: $("#dropFile"),
         maxFileSize: 5000000, // 5 MB
         maxChunkSize: 4096, // in bytes
         // Enable image resizing, except for Android and Opera,
@@ -72,8 +73,8 @@ $(function () {
         previewMaxHeight: 50,
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
-        $('#fileListHolder').removeClass('hide');
-        $('#progress').removeClass('hide');
+        $('#fileListHolder').show(300);
+        $('#progress').show(300);
 
         data.guId = guid();
         data.uId =  $('<div/>').uniqueId().attr('id');
@@ -186,6 +187,7 @@ $(function () {
             .find('#remove-' + data.uId)
                 .data('uploaded', true)
                 .show();
+
         filesUploaded++;
     }).on('fileuploadfail', function (e, data) {
         $.each(data.files, function (index) {
@@ -325,8 +327,8 @@ var deleteFile = function (data, removeContext) {
         var progress = formatPercentage(fileCount / filesUploaded)
 
         if (fileCount == 0) {
-            $('#fileListHolder').addClass('hide');
-            $('#progress').addClass('hide');
+            $('#fileListHolder').hide(300);
+            $('#progress').hide(300);
 
             filesUploaded = 0;
             $('#btnStartUpload')

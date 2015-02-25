@@ -1,7 +1,4 @@
-﻿@{
-    ViewBag.Title = "File Upload";
-}
-<div class="col-sm-12">
+﻿<div id="dropFile" class="col-sm-12">
     <!-- The fileinput-button span is used to style the file input field as button -->
     <span class="btn btn-success fileinput-button">
         <i class="glyphicon glyphicon-plus"></i>
@@ -12,18 +9,21 @@
     <button disabled title="Start Upload" id="btnStartUpload" type="button" class="btn btn-primary">
         <span class="glyphicon glyphicon-cloud-upload"></span> Start upload
     </button>
-    <button title="Cancel upload, pending and uploaded files" id="btnCancelUpload" disabled="disabled" type="button" class="btn btn-warning">
+    <button disabled title="Cancel upload" id="btnCancelUpload" type="button" class="btn btn-warning">
         <span class="glyphicon glyphicon-ban-circle"></span> Cancel upload
+    </button>
+    <button disabled title="Delete uploaded files" id="btnDelete" type="button" class="btn btn-danger delete">
+        <span class="glyphicon glyphicon-trash"></span> Delete
     </button>
     <div class="checkbox">
         <input class="checkbox-inline" type="checkbox" id="autoUpload" title="Auto Upload" style="padding-top: 0; margin-left: 0;" checked /><label for="autoUpload">Auto Upload</label>
     </div>
     <div class="clearfix"></div>
     <!-- The global progress bar -->
-    <div id="progress" class="progress hide">
+    <div id="progress" class="progress" style="display: none;">
         <div class="progress-bar progress-bar-success"></div>
     </div>
-    <div class="panel panel-default hide" id="fileListHolder" style="margin-top: 20px;">
+    <div class="panel panel-default" id="fileListHolder" style="margin-top: 20px; display: none;">
         <div class="panel-heading">
             <span class="badge" id="fileCount"></span>
         </div>

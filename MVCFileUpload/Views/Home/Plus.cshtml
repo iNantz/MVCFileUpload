@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Plus";
+}
+<br />
+<ul id="theTabs" class="nav nav-tabs">
+    <li>@Html.ActionLink("Basic", "Basic", "Home")</li>
+    <li class="active">@Html.ActionLink("Plus", "Plus", "Home")</li>
+</ul>
+<br />
+@Html.Partial("~/Views/Shared/FileUpload/_Plus.cshtml")
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryfileUpload")
+}

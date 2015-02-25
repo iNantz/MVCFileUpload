@@ -1,0 +1,35 @@
+﻿<div id="dropFile" class="col-sm-12">
+    <!-- The fileinput-button span is used to style the file input field as button -->
+    <span class="btn btn-success fileinput-button">
+        <i class="glyphicon glyphicon-plus"></i>
+        <span>Add files...</span>
+        <!-- The file input field used as target for the file upload widget -->
+        <input id="fileupload" type="file" name="files[]" multiple>
+    </span>
+    <br />
+    <br />
+    <!-- The global progress bar -->
+    <div id="progress" class="progress" style="display: none;">
+        <div class="progress-bar progress-bar-success"></div>
+    </div>
+    <div class="panel panel-default" id="fileListHolder" style="margin-top: 20px; display: none;">
+        <div class="panel-heading">
+            <span class="badge" id="fileCount"></span>
+        </div>
+        <div class="panel-body">
+            <table class="table table-responsive" id="fileList" title="list of files">
+                <thead>
+                    <tr>
+                        <th class="col-sm-2">Type</th>
+                        <th class="col-sm-4">File Name</th>
+                        <th class="col-sm-2 text-right">Length</th>
+                        <th class="col-sm-2">Status</th>
+                        <th class="col-sm-2 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="fileList"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
