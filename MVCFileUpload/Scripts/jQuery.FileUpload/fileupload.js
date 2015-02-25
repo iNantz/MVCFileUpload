@@ -74,7 +74,7 @@ $(function () {
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
         $('#fileListHolder').show(300);
-        $('#progress').show(300);
+        $('#progress').show(300);        
 
         data.guId = guid();
         data.uId =  $('<div/>').uniqueId().attr('id');
@@ -83,7 +83,6 @@ $(function () {
             .appendTo('#fileList');
 
         $.each(data.files, function (index, file) {
-            fileCount++;
             var tdFileName = $('<td/>')
                     .append($('<span/>')
                         .attr('id', 'name-' + data.uId)
@@ -115,7 +114,7 @@ $(function () {
             tdStatus.appendTo(data.context);
             tdAction.appendTo(data.context);
         });
-        $("#fileCount").text(fileCount);
+        $("#fileCount").text($('#fileList tr').length);
     }).on('fileuploadprocessalways', function (e, data) {
         var index = data.index,
             file = data.files[index];
@@ -135,6 +134,13 @@ $(function () {
             data.context
                 .find('.progress')
                 .remove();
+
+            $('#btnDelete')
+           .on('click', function () {
+               $(this).prop('disabled', true);
+               deleteFile(data, true);
+           })
+           .prop('disabled', false);
         }
         else
         {
@@ -188,6 +194,14 @@ $(function () {
                 .data('uploaded', true)
                 .show();
 
+        $('#btnDelete')
+            .on('click', function () {
+                $(this).prop('disabled', true);
+                data.submitted = true;
+                deleteFile(data, true);
+            })
+            .prop('disabled', false);
+
         filesUploaded++;
     }).on('fileuploadfail', function (e, data) {
         $.each(data.files, function (index) {
@@ -200,6 +214,12 @@ $(function () {
                 .remove();
             // data.jqXHR.statusText
         });
+        $('#btnDelete')
+           .on('click', function () {
+               $(this).prop('disabled', true);
+               deleteFile(data, true);
+           })
+           .prop('disabled', false);
     }).on('fileuploadsubmit', function (e, data) {
         // make sure each submit is unique
         data.formData = { uid: data.guId };
@@ -227,8 +247,7 @@ $(function () {
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
 });
 
-var fileCount = 0,
-    filesDeleted = 0,
+var filesDeleted = 0,
     filesUploaded = 0,
     apiUrl = parentUrl + 'api/fileutils';
 
@@ -245,7 +264,6 @@ var submitData = function (data) {
 
     if (!haserror && !uploaded) {
         var jqXhrStart = data.submit();
-        $('#btnCancelUpload').prop('disabled', false);
         btnRemove.hide();
 
         data.context
@@ -269,6 +287,7 @@ var submitData = function (data) {
 
         $('#btnCancelUpload').click(function () {
             jqXhrStart.abort();
+            $(this).prop('disabled', true);
 
             var startBtn = data.context
                                .find('#start-' + data.uId);
@@ -284,7 +303,7 @@ var submitData = function (data) {
                    .show();
             data.submitted = true;
             deleteFile(data, false);
-        });
+        }).prop('disabled', false);
     }
 };
 
@@ -320,20 +339,24 @@ var deleteFile = function (data, removeContext) {
         // remove the item from the list
         data.context.remove();
 
-        fileCount--;
+        var fileCount = $('#fileList tr').length;
 
         $("#fileCount").text(fileCount);
 
         var progress = formatPercentage(fileCount / filesUploaded)
 
-        if (fileCount == 0) {
+        filesUploaded--;
+
+        if (fileCount < 1) {
             $('#fileListHolder').hide(300);
             $('#progress').hide(300);
 
-            filesUploaded = 0;
             $('#btnStartUpload')
                 .off('click')
                 .prop('disabled', true);
+
+            filesDeleted = 0;
+            filesUploaded = 0;
         }
 
         $('#progress .progress-bar')
